@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System - Login</title>
+    <style>
+        /* General Page Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: url("static/moon.jpeg") no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        /* Login Container */
+        .login-container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            padding-right: 55px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Logo Styling */
+        .login-container img {
+            width: 100px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        /* Heading */
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+            font-size: xx-large;
+        }
+
+        /* Input Group */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* Input Fields */
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transition: border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Placeholder Styling */
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Focus Effect */
+        input:focus {
+            border-color: #f1c40f;
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+            outline: none;
+        }
+
+        /* Submit Button */
+        button {
+            width: 70%;
+            margin-left: 30px;
+            padding: 12px;
+            background: linear-gradient(to right, #f1c40f, #f39c12);
+            border: none;
+            border-radius: 8px;
+            color: black;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #f39c12, #e67e22);
+            transform: scale(1.05);
+        }
+
+        /* Error Message */
+        .error-message {
+            color: #ff4d4d;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Forgot Password Link */
+        .forgot-password {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .forgot-password a {
+            color: #f1c40f;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 20px;
+                max-width: 320px;
+            }
+
+            input {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 16px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div class="login-container">
+        <img src="static/login.png" width="100">
+        <div class="login-box">
+            <h2>Login</h2>
+            <form id="loginForm" action="/login" method="POST">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <p class="error-message" id="errorMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        // Display error message if redirected with an error
+        const params = new URLSearchParams(window.location.search);
+        if (params.has("error")) {
+            document.getElementById("errorMessage").innerText = "Invalid username or password!";
+        }
+    </script>
+</body>
+</html>

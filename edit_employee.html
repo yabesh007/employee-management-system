@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Employee</title>
+    <style>
+        /* CSS Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: url("static/edit_back.jpg");
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .employee-edit-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input, select, textarea {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #8a8787;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        button {
+            width: 48%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .save-btn {
+            background: #2575fc;
+        }
+
+        .save-btn:hover {
+            background: #6a11cb;
+        }
+
+        .cancel-btn {
+            background: #e74c3c;
+        }
+
+        .cancel-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Edit Employee Form -->
+    <div class="employee-edit-container">
+        <h2>Edit Employee</h2>
+        <form id="editEmployeeForm">
+            <input type="hidden" id="employeeId" name="employeeId">
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" required>
+
+            <label for="department">Department:</label>
+            <select id="department" name="department" required>
+                <option value="HR">HR</option>
+                <option value="IT">IT</option>
+                <option value="Software Development">Software Development</option>
+                <option value="Cybersecurity">Cybersecurity</option>
+                <option value="Data Science">Data Science</option>
+                <option value="AI & Machine Learning">AI & Machine Learning</option>
+                <option value="Cloud Computing">Cloud Computing</option>
+                <option value="IT Support">IT Support</option>
+                <option value="Sales">Sales</option>
+                <option value="Finance">Finance</option>
+                <option value="Operations">Operations</option>
+            </select>
+
+            <label for="dateOfJoining">Date of Joining:</label>
+            <input type="date" id="dateOfJoining" name="dateOfJoining" required>
+
+            <label for="salary">Salary:</label>
+            <input type="number" id="salary" name="salary" required>
+
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" required></textarea>
+
+            <div class="btn-container">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <button type="button" class="cancel-btn" onclick="cancelEdit()">Cancel</button>
+            </div>
+        </form>
+    </div>
+<!-- JavaScript -->
+<script>
+    // Function to load employee details from URL parameters
+    function loadEmployeeData() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        document.getElementById('employeeId').value = urlParams.get('employeeId') || '';
+        document.getElementById('name').value = decodeURIComponent(urlParams.get('name') || '');
+        document.getElementById('email').value = decodeURIComponent(urlParams.get('email') || '');
+        document.getElementById('phone').value = decodeURIComponent(urlParams.get('phone') || '');
+        document.getElementById('department').value = decodeURIComponent(urlParams.get('department') || '');
+        document.getElementById('salary').value = decodeURIComponent(urlParams.get('salary') || '');
+        document.getElementById('address').value = decodeURIComponent(urlParams.get('address') || '');
+
+        // ✅ Fix Date of Joining Field
+        let dateOfJoining = urlParams.get('dateOfJoining');
+        if (dateOfJoining) {
+            // Convert to YYYY-MM-DD format if needed
+            let formattedDate = new Date(dateOfJoining).toISOString().split('T')[0];
+            document.getElementById('dateOfJoining').value = formattedDate;
+        }
+    }
+
+
+    // Function to save the edited employee details
+    function saveEmployeeChanges(event) {
+        event.preventDefault(); // Prevent form submission
+
+        const employeeId = document.getElementById('employeeId').value;
+        const formData = new URLSearchParams(new FormData(document.getElementById('editEmployeeForm'))).toString();
+
+        fetch(`/edit_employee/${employeeId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            window.location.href = 'employees.html'; // Redirect back to Employees Page
+        })
+        .catch(error => console.error("Error updating employee:", error));
+    }
+
+    // Function to cancel edit and return to Employees Page
+    function cancelEdit() {
+        window.location.href = 'employees.html';
+    }
+
+    // Attach the save function to the form submission
+    document.addEventListener("DOMContentLoaded", function() {
+        loadEmployeeData();
+        document.getElementById('editEmployeeForm').addEventListener('submit', saveEmployeeChanges);
+    });
+</script>    
+</body>
+</html>

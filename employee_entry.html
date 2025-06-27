@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System - Employee Entry</title>
+    <style>
+        /* General Page Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: url('/static/add_employee_back.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container for Employee Entry Form */
+        .employee-entry-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .employee-entry-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Form Heading */
+        h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* Input Group */
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        /* Labels */
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        /* Input Fields */
+        input, select, textarea {
+            width: 90%;
+            padding: 12px;
+            border: 1px solid #aaa;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Focus Effect */
+        input:focus, select:focus, textarea:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 8px rgba(37, 117, 252, 0.3);
+            outline: none;
+        }
+
+        /* Textarea */
+        textarea {
+            resize: vertical;
+            height: 90px;
+        }
+
+        /* Submit Button */
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            transform: scale(1.05);
+        }
+
+        /* Clear Button */
+        .clear-btn {
+            background: #e74c3c;
+            margin-top: 10px;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Success Message */
+        .success-message {
+            margin-top: 15px;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        /* Back to Dashboard Link */
+        .back-link {
+            margin-top: 15px;
+            color: #555;
+        }
+
+        .back-link a {
+            color: #2575fc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .employee-entry-container {
+                padding: 20px;
+            }
+            
+            input, select, textarea {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 16px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Employee Entry Form -->
+    <div class="employee-entry-container">
+        <h2>Employee Entry</h2>
+        <form action="/add_employee" method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+        
+            <label for="department">Department:</label>
+            <select id="department" name="department" required>
+                <option value="HR">HR</option>
+                <option value="IT">IT</option>
+                <option value="Software Development">Software Development</option>
+                <option value="Cybersecurity">Cybersecurity</option>
+                <option value="Data Science">Data Science</option>
+                <option value="AI & Machine Learning">AI & Machine Learning</option>
+                <option value="Cloud Computing">Cloud Computing</option>
+                <option value="IT Support">IT Support</option>
+                <option value="Sales">Sales</option>
+                <option value="Finance">Finance</option>
+                <option value="Operations">Operations</option>
+            </select>
+        
+            <label for="dateOfJoining">Date of Joining:</label>
+            <input type="date" id="dateOfJoining" name="dateOfJoining" required>
+
+            <label for="salary">Salary:</label>
+            <input type="number" id="salary" name="salary" required>
+        
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" required></textarea>
+        
+            <button type="submit">Add Employee</button>
+        </form>
+            
+        <p class="back-link">Go back to <a href="/dashboard">Dashboard</a></p>
+        <div id="successMessage" class="success-message"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Function to handle form submission
+        document.getElementById('employeeEntryForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(this); // Collect form data
+            formData.append("gender", document.getElementById("gender").value);
+
+            fetch('/add_employee', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();  // Convert response to JSON
+                } else {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+            })
+            .then(data => {
+                alert("Employee added successfully!"); // Show success message
+                window.location.href = "{{ url_for('dashboard') }}"; 
+            })
+            .catch(error => {
+                alert("Error adding employee: " + error.message);
+            });
+        });
+
+    </script>
+</body>
+</html>

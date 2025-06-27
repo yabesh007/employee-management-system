@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Reports</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7f9; text-align: center; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #2c3e50; color: white; }
+        tr:hover { background: #f1f1f1; }
+        button { padding: 10px; margin: 10px; border: none; cursor: pointer; }
+        .btn-download { background: #2575fc; color: white; }
+        .btn-download:hover { background: #1a5bbf; }
+        .back-link a { color: #2575fc; text-decoration: none; font-size: 18px; }
+        .back-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Employee Reports</h1>
+
+    <button class="btn-download" onclick="downloadCSV()">Download CSV</button>
+    <button class="btn-download" onclick="downloadPDF()">Download PDF</button>
+
+    <table id="reportTable">
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Department</th>
+                <th>Date of Joining</th>
+                <th>Salary</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody id="reportTableBody">
+            <!-- Employee data will be inserted here dynamically -->
+        </tbody>
+    </table>
+
+    <div class="back-link">
+        <a href="/dashboard">Go back to Dashboard</a>
+    </div>
+
+    <script>
+        function fetchReportData() {
+            fetch('/get_reports')
+            .then(response => response.json())
+            .then(data => {
+                let tableBody = document.getElementById("reportTableBody");
+                tableBody.innerHTML = "";
+
+                data.forEach(employee => {
+                    let row = `
+                        <tr>
+                            <td>${employee.employee_id}</td>
+                            <td>${employee.name}</td>
+                            <td>${employee.gender}</td>
+                            <td>${employee.email}</td>
+                            <td>${employee.phone}</td>
+                            <td>${employee.department}</td>
+                            <td>${employee.date_of_joining}</td>
+                            <td>${employee.salary}</td>
+                            <td>${employee.address}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            })
+            .catch(error => console.error("Error fetching reports:", error));
+        }
+
+        function downloadCSV() {
+            fetch('/get_reports')
+            .then(response => response.json())
+            .then(data => {
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Employee ID,Name,Email,Phone,Department,Date of Joining,Salary,Address\n";
+
+                data.forEach(employee => {
+                    let row = `${employee.employee_id},${employee.name},${employee.email},${employee.phone},${employee.department},${employee.date_of_joining},${employee.salary},${employee.address}`;
+                    csvContent += row + "\n";
+                });
+
+                let encodedUri = encodeURI(csvContent);
+                let link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "employee_report.csv");
+                document.body.appendChild(link);
+                link.click();
+            });
+        }
+
+        function downloadPDF() {
+            fetch('/get_reports')
+            .then(response => response.json())
+            .then(data => {
+                let docDefinition = {
+                    content: [
+                        { text: 'Employee Report', style: 'header' },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                                body: [
+                                    ['Employee ID', 'Name', 'Email', 'Phone', 'Department', 'Date of Joining', 'Salary', 'Address'],
+                                    ...data.map(emp => [emp.employee_id, emp.name, emp.email, emp.phone, emp.department, emp.date_of_joining, emp.salary, emp.address])
+                                ]
+                            }
+                        }
+                    ],
+                    styles: {
+                        header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] }
+                    }
+                };
+                pdfMake.createPdf(docDefinition).download("employee_report.pdf");
+            });
+        }
+
+        fetchReportData();
+    </script>
+</body>
+</html>

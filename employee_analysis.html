@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background: white;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .chart-container { 
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            gap: 60px; 
+        }
+        .chart-wrapper {
+            width: 700px; 
+            height: 400px; 
+            margin-top: 70px;
+        }
+        canvas { 
+            width: 100% !important; 
+            height: 100% !important; 
+        }
+        .back-link { margin-top: 90px; margin-bottom: 50px; }
+        .back-link a { 
+            color: #2575fc; 
+            text-decoration: none; 
+            font-size: 18px; 
+        }
+        .back-link a:hover { 
+            text-decoration: underline; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Employee Analysis</h1>
+    
+    <div class="chart-container">
+        <div class="chart-wrapper">
+            <h3>Employees Joined Per Month & Year</h3>
+            <canvas id="employeeJoinChart"></canvas>
+        </div>
+        <div class="chart-wrapper">
+            <h3>Salary Distribution</h3>
+            <canvas id="salaryChart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div class="chart-wrapper">
+            <h3>Number of Employees in Each Department</h3>
+            <canvas id="departmentChart"></canvas>
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a href="/dashboard">Go back to Dashboard</a>
+    </div>
+
+    <script>
+        let employeeJoinChartInstance = null; // Store chart instance to prevent duplicates
+
+        function loadEmployeeData() {
+            fetch('/get_employee_analysis')
+                .then(response => response.json())
+                .then(data => {
+                    createEmployeeJoinChart(data.joinsPerMonthYear);
+                    createSalaryChart(data.salaryDistribution);
+                })
+                .catch(error => console.error("Error loading employee data:", error));
+
+            fetch('/get_department_analysis')
+                .then(response => response.json())
+                .then(data => {
+                    createDepartmentChart(data);
+                })
+                .catch(error => console.error("Error loading department data:", error));
+        }
+
+        function createEmployeeJoinChart(joinsPerMonthYear) {
+            const chartData = [];
+            const monthsOrder = [
+                "January", "February", "March", "April", "May", "June", 
+                "July", "August", "September", "October", "November", "December"
+            ];
+            
+            const years = Object.keys(joinsPerMonthYear).sort();
+            years.forEach(year => {
+                monthsOrder.forEach(month => {
+                    if (joinsPerMonthYear[year][month]) {
+                        chartData.push({ x: `${month} ${year}`, y: joinsPerMonthYear[year][month] });
+                    }
+                });
+            });
+
+            const ctx = document.getElementById('employeeJoinChart').getContext('2d');
+
+            // Destroy previous instance to prevent canvas expansion
+            if (employeeJoinChartInstance !== null) {
+                employeeJoinChartInstance.destroy();
+            }
+
+            employeeJoinChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(d => d.x),
+                    datasets: [{
+                        label: 'Employees Joined',
+                        data: chartData.map(d => d.y),
+                        borderColor: '#2575fc',
+                        backgroundColor: 'rgba(37, 117, 252, 0.2)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Ensures fixed size
+                    scales: {
+                        x: { title: { display: true, text: 'Month-Year' } },
+                        y: { title: { display: true, text: 'Employees Joined' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function createSalaryChart(salaryData) {
+            const ctx = document.getElementById('salaryChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(salaryData),
+                    datasets: [{
+                        data: Object.values(salaryData),
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false // Ensures fixed size
+                }
+            });
+        }
+
+        function createDepartmentChart(departmentData) {
+            const ctx = document.getElementById('departmentChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(departmentData),
+                    datasets: [{
+                        label: 'Employees per Department',
+                        data: Object.values(departmentData),
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Ensures fixed size
+                    scales: {
+                        y: { title: { display: true, text: 'Number of Employees' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        window.onload = loadEmployeeData;
+    </script>
+</body>
+</html>
